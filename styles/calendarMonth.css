@@ -1,0 +1,40 @@
+.day-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  #calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 6px;
+    border-color: white;
+    padding: 5px 5px;
+  }
+
+  .day {
+    border: 1px solid #ccc;
+    min-height: 100px;
+    padding: 5px;
+    position: relative;
+  }
+
+  .day.today {
+    background-color: #e0f7fa;
+    border: 2px solid #0288d1;
+  }
+
+  .event {
+    background-color: #d1e7dd;
+    margin-top: 4px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
