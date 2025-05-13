@@ -12,14 +12,15 @@
     <button onclick="navigate('calendarMonth.html')">Month</button>
   </nav>
 
-
-  <h1>Add a Task</h1>
-  <form id="task-form">
-    <input type="text" id="task-name" placeholder="Task name" required />
-    <input type="number" id="task-duration" placeholder="Duration (hrs)" required />
-    <input type="date" id="task-deadline" required />
-    <button type="submit">Add Task</button>
-  </form>
+  <div id="task-adder">
+    <h1>Add a Task</h1>
+    <form id="task-form">
+      <input type="text" id="task-name" placeholder="Task name" required />
+      <input type="number" id="task-duration" placeholder="Duration (hrs)" required />
+      <input type="date" id="task-deadline" required />
+      <button type="submit">Add Task</button>
+    </form>
+  </div>
 
   <ul id="task-list"></ul>
 

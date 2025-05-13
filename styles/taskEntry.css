@@ -1,1 +1,87 @@
-.task-form
+/* styles/taskEntry.css */
+
+/* Container for the task form */
+#task-adder {
+    background-color: white;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  #task-adder h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+  }
+  
+  /* Task form inputs */
+  #task-form input {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  
+  /* Submit button */
+  #task-form button {
+    background-color: #0188e9;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+  }
+  
+  #task-form button:hover {
+    background-color: #006fc1;
+  }
+  
+  /* Task list styles */
+/* Task list container */
+#task-list {
+    background-color: white;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  #task-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #fafafa;
+    transition: background-color 0.2s ease;
+  }
+  
+  .task-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #task-list button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  #task-list button:hover {
+    background-color: #005bb5;
+  }
+  

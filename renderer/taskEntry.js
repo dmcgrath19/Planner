@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const taskFilePath = path.join(__dirname, '..', 'data', 'tasks.json');
+let timers = {}; // Stores interval IDs and paused states
 
 document.getElementById('task-form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -15,24 +16,19 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
     duration,
     deadline,
     createdAt: new Date().toISOString(),
-    remainingTime: duration * 60 // store time in seconds
+    remainingTime: duration * 60, // store time in seconds
+    isPaused: true
   };
 
-  // Load existing tasks
   let tasks = [];
   if (fs.existsSync(taskFilePath)) {
     tasks = JSON.parse(fs.readFileSync(taskFilePath));
   }
 
   tasks.push(newTask);
-
-  // Save updated list
   fs.writeFileSync(taskFilePath, JSON.stringify(tasks, null, 2));
-
-  // Refresh task list
   renderTasks(tasks);
 
-  // Show a native notification
   if (Notification.permission === 'granted') {
     new Notification('Task Added', {
       body: `Task "${newTask.name}" added. Due ${newTask.deadline}.`
@@ -47,59 +43,87 @@ document.getElementById('task-form').addEventListener('submit', (e) => {
     });
   }
 
-  // Clear form
   e.target.reset();
 });
 
 function renderTasks(tasks) {
   const list = document.getElementById('task-list');
-  list.innerHTML = ''; // Clear existing task list
+  list.innerHTML = '';
+
   tasks.forEach((task, index) => {
     const li = document.createElement('li');
-    li.textContent = `${task.name} – ${task.duration}h – due ${task.deadline}`;
 
-    // Create a button to start the timer
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start Timer';
-    startButton.addEventListener('click', () => startTimer(task, index));
+    const taskText = document.createElement('span');
+    taskText.textContent = `${task.name} – ${task.duration}h – due ${task.deadline}`;
+    taskText.className = 'task-name';
 
     const timerDisplay = document.createElement('span');
     timerDisplay.id = `timer-${index}`;
     timerDisplay.textContent = `Time remaining: ${formatTime(task.remainingTime)}`;
+    timerDisplay.className = 'task-meta';
 
-    li.appendChild(startButton);
-    li.appendChild(timerDisplay);
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = 'Start';
+    toggleButton.addEventListener('click', () => toggleTimer(task, index, toggleButton));
+
+    const container = document.createElement('div');
+    container.className = 'task-info';
+    container.appendChild(taskText);
+    container.appendChild(timerDisplay);
+
+    li.appendChild(container);
+    li.appendChild(toggleButton);
     list.appendChild(li);
   });
+
+  // Save task states (like remaining time) persistently
+  fs.writeFileSync(taskFilePath, JSON.stringify(tasks, null, 2));
 }
 
-function startTimer(task, index) {
+function toggleTimer(task, index, button) {
   const timerDisplay = document.getElementById(`timer-${index}`);
 
-  const interval = setInterval(() => {
-    if (task.remainingTime > 0) {
-      task.remainingTime--;
-      timerDisplay.textContent = `Time remaining: ${formatTime(task.remainingTime)}`;
-    } else {
-      clearInterval(interval);
-      new Notification(`Task "${task.name}" complete!`, {
-        body: `You finished your task! Well done.`
-      });
-    }
-  }, 1000);
+  if (timers[index] && timers[index].intervalId) {
+    // If running, pause it
+    clearInterval(timers[index].intervalId);
+    timers[index] = { ...timers[index], intervalId: null };
+    button.textContent = 'Start';
+  } else {
+    // Start or resume
+    const intervalId = setInterval(() => {
+      if (task.remainingTime > 0) {
+        task.remainingTime--;
+        timerDisplay.textContent = `Time remaining: ${formatTime(task.remainingTime)}`;
+        saveTaskState(index, task);
+      } else {
+        clearInterval(intervalId);
+        button.disabled = true;
+        new Notification(`Task "${task.name}" complete!`, {
+          body: `You finished your task! Well done.`
+        });
+      }
+    }, 1000);
+
+    timers[index] = { intervalId };
+    button.textContent = 'Pause';
+  }
+}
+
+function saveTaskState(index, task) {
+  let tasks = JSON.parse(fs.readFileSync(taskFilePath));
+  tasks[index] = task;
+  fs.writeFileSync(taskFilePath, JSON.stringify(tasks, null, 2));
 }
 
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes}m ${remainingSeconds}s`;
+  return `${minutes}m ${remainingSeconds.toString().padStart(2, '0')}s`;
 }
 
-// Load tasks on startup
 if (fs.existsSync(taskFilePath)) {
   const savedTasks = JSON.parse(fs.readFileSync(taskFilePath));
   renderTasks(savedTasks);
 } else {
-  // If there are no saved tasks, create an empty task array
   renderTasks([]);
 }
