@@ -1,0 +1,13 @@
+{
+    "name": "scheduler-app",
+    "version": "1.0.0",
+    "main": "main.js",
+    "scripts": {
+      "start": "electron ."
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "electron": "^29.0.0"
+    }
+  }
+  
