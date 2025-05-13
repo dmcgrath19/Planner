@@ -1,5 +1,14 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, nativeImage } = require('electron');
 const path = require('path');
+
+// Detect the platform and set the appropriate icon format
+function getIconPath() {
+  const iconBasePath = path.join(__dirname, 'assets');
+  switch (process.platform) {
+    default:
+      return path.join(iconBasePath, 'icon.png');  // Default to PNG
+  }
+}
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -9,13 +18,20 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false
-    }
+    },
+    icon: getIconPath()
   });
 
-  win.loadFile('renderer/index.html');
+  win.loadFile('views/taskEntry.html');
 }
 
 app.whenReady().then(() => {
+  // Set the Dock icon on macOS
+  if (process.platform === 'darwin') {
+    const dockIcon = nativeImage.createFromPath(getIconPath());
+    app.dock.setIcon(dockIcon);
+  }
+
   createWindow();
 
   app.on('activate', function () {

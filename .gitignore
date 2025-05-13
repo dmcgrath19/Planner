@@ -1,2 +1,5 @@
 node_modules/*
 *.json
+*.pak
+Planner*
+scheduler-app-darwin-x64/*
