@@ -1,22 +1,78 @@
+const flatpickr = require("flatpickr");
 const fs = require('fs');
 const path = require('path');
 
 const taskFilePath = path.join(__dirname, '..', 'data', 'tasks.json');
 let timers = {}; // Stores interval IDs and paused states
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize flatpickr
+  flatpickr("#task-deadline", {
+    minDate: "today",
+    defaultDate: "today",
+    dateFormat: "d-m-Y"
+  });
+
+  // Add toggle button above the form
+  const app = document.getElementById('app');
+  const taskAdder = document.getElementById('task-form').parentElement; // the div containing the form
+
+  const toggleBtn = document.createElement('button');
+  toggleBtn.textContent = 'Add Task ▼';
+  toggleBtn.style.marginBottom = '1em';
+  toggleBtn.style.cursor = 'pointer';
+  toggleBtn.type = 'button'; // prevent form submit on toggle button
+
+  app.insertBefore(toggleBtn, taskAdder);
+
+  toggleBtn.addEventListener('click', () => {
+    const computedDisplay = window.getComputedStyle(taskAdder).display;
+    if (computedDisplay === 'none') {
+      taskAdder.style.display = 'block';
+      toggleBtn.textContent = 'Add Task ▲';
+    } else {
+      taskAdder.style.display = 'none';
+      toggleBtn.textContent = 'Add Task ▼';
+    }
+  });
+
+  // Optionally start with form minimized:
+  // taskAdder.style.display = 'none';
+
+  // Load and render saved tasks
+  if (fs.existsSync(taskFilePath)) {
+    const savedTasks = JSON.parse(fs.readFileSync(taskFilePath));
+    renderTasks(savedTasks);
+  } else {
+    renderTasks([]);
+  }
+});
+
 document.getElementById('task-form').addEventListener('submit', (e) => {
   e.preventDefault();
 
   const name = document.getElementById('task-name').value;
   const duration = parseFloat(document.getElementById('task-duration').value);
-  const deadline = document.getElementById('task-deadline').value;
+  const deadline = document.getElementById('task-deadline').value; // dd-mm-yyyy string
+  
+  const [day, month, year] = deadline.split('-').map(Number);
+  const deadlineDate = new Date(year, month - 1, day);
+  deadlineDate.setHours(0, 0, 0, 0);
+
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  if (deadlineDate < todayDate) {
+    alert('Please select today or a future date.');
+    return;
+  }
 
   const newTask = {
     name,
     duration,
-    deadline,
+    deadline,  // save string date here, not Date object
     createdAt: new Date().toISOString(),
-    remainingTime: duration * 60, // store time in seconds
+    remainingTime: duration * 60,
     isPaused: true
   };
 
@@ -76,7 +132,6 @@ function renderTasks(tasks) {
     list.appendChild(li);
   });
 
-  // Save task states (like remaining time) persistently
   fs.writeFileSync(taskFilePath, JSON.stringify(tasks, null, 2));
 }
 
@@ -84,12 +139,10 @@ function toggleTimer(task, index, button) {
   const timerDisplay = document.getElementById(`timer-${index}`);
 
   if (timers[index] && timers[index].intervalId) {
-    // If running, pause it
     clearInterval(timers[index].intervalId);
     timers[index] = { ...timers[index], intervalId: null };
     button.textContent = 'Start';
   } else {
-    // Start or resume
     const intervalId = setInterval(() => {
       if (task.remainingTime > 0) {
         task.remainingTime--;
@@ -119,11 +172,4 @@ function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}m ${remainingSeconds.toString().padStart(2, '0')}s`;
-}
-
-if (fs.existsSync(taskFilePath)) {
-  const savedTasks = JSON.parse(fs.readFileSync(taskFilePath));
-  renderTasks(savedTasks);
-} else {
-  renderTasks([]);
 }

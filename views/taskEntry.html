@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Task Scheduler</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../styles/taskEntry.css">
 </head>
@@ -10,9 +11,10 @@
   <nav>
     <button onclick="navigate('taskEntry.html')">Tasks</button>
     <button onclick="navigate('calendarMonth.html')">Month</button>
+    <button id="toggle-task-adder" style="margin-left: 20px;">Add Task ▼</button>
   </nav>
 
-  <div id="task-adder">
+  <div id="task-adder" style="margin-top: 10px;">
     <h1>Add a Task</h1>
     <form id="task-form">
       <input type="text" id="task-name" placeholder="Task name" required />
@@ -28,7 +30,22 @@
     function navigate(page) {
       window.location.href = page;
     }
+
+    // Toggle task adder form visibility
+    const toggleBtn = document.getElementById('toggle-task-adder');
+    const taskAdder = document.getElementById('task-adder');
+
+    toggleBtn.addEventListener('click', () => {
+      if (taskAdder.style.display === 'none' || taskAdder.style.display === '') {
+        taskAdder.style.display = 'block';
+        toggleBtn.textContent = 'Add Task ▲';
+      } else {
+        taskAdder.style.display = 'none';
+        toggleBtn.textContent = 'Add Task ▼';
+      }
+    });
   </script>
+
   <script src="../renderer/taskEntry.js"></script>
 </body>
 </html>

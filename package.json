@@ -12,5 +12,8 @@
     "build": {
         "appId": "delia.CAN.plan",
         "icon": "assets/icon.icns"
+    },
+    "dependencies": {
+        "flatpickr": "^4.6.13"
     }
 }
