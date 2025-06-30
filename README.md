@@ -33,14 +33,6 @@ Or run via terminal:
 open /path/to/Planner-darwin-arm64/Planner.app
 ```
 
-Notes
-
-By default, the app packages for your current Mac architecture (arm64 for M1, x64 for Intel).
-
-To target a specific architecture, use the --arch flag with electron-packager:
-npx electron-packager . Planner --platform=darwin --arch=arm64 --overwrite
-
-To create a .dmg installer for easier distribution, consider using electron-builder.
-
+#### Future iterations will aim to have a dmg installer
 
 Made through planning!
